@@ -42,6 +42,8 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
+          annotations: |
+            manifest-descriptor
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -51,6 +53,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          sbom: true
+          provenance: mode=max
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |

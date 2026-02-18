@@ -19,11 +19,14 @@ RUN set -eux; \
 
 FROM scratch
 
-LABEL org.opencontainers.image.source=https://github.com/ixti/ecstatic
+LABEL org.opencontainers.image.title="ecstatic"
 LABEL org.opencontainers.image.description="Joyful ECS Task Utilities"
-LABEL org.opencontainers.image.licenses=MIT
+LABEL org.opencontainers.image.url="https://github.com/ixti/ecstatic"
+LABEL org.opencontainers.image.source="https://github.com/ixti/ecstatic"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.vendor="ixti"
 
-COPY --from=builder /ecstatic /bin/ecstatic
+COPY --from=builder /ecstatic /ecstatic
 
-ENTRYPOINT ["/ecs-task-helper"]
+ENTRYPOINT ["/ecstatic"]
 CMD ["help"]

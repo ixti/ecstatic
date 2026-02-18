@@ -12,7 +12,6 @@ A lightweight CLI tool providing utilities for containers running on AWS ECS.
 - Export metadata as environment variables or JSON
 - Execute commands with metadata automatically injected into the environment
 - Lightweight HTTP health check utility
-- Minimal Docker image built from scratch (~2MB)
 - Multi-architecture support (linux/amd64, linux/arm64)
 
 

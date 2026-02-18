@@ -1,13 +1,10 @@
-# ECS Task Helper Utilities
+# Joyful ECS Task Utilities
 
-[![CI](https://github.com/ixti/ecs-task-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/ixti/ecs-task-helper/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/ixti/ecs-task-helper/graph/badge.svg?token=toUztJc66F)](https://codecov.io/gh/ixti/ecs-task-helper)
+[![CI](https://github.com/ixti/ecstatic/actions/workflows/ci.yml/badge.svg)](https://github.com/ixti/ecstatic/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ixti/ecstatic/graph/badge.svg?token=toUztJc66F)](https://codecov.io/gh/ixti/ecstatic)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A lightweight CLI tool providing utilities for AWS ECS containers.
-It fetches ECS task metadata and exposes it as environment variables,
-making container introspection simple.
-
+A lightweight CLI tool providing utilities for containers running on AWS ECS.
 
 ## Features
 
@@ -24,13 +21,13 @@ making container introspection simple.
 ### Docker
 
 ```sh
-docker pull ghcr.io/ixti/ecs-task-helper:latest
+docker pull ghcr.io/ixti/ecstatic:latest
 ```
 
 ### From Source
 
 ```sh
-go install github.com/ixti/ecs-task-helper@latest
+go install github.com/ixti/ecstatic@latest
 ```
 
 ## Usage
@@ -41,10 +38,10 @@ Fetches and prints ECS container metadata in the specified format.
 
 ```sh
 # Print as environment variables (default)
-ecs-task-helper metadata
+ecstatic metadata
 
 # Print as JSON
-ecs-task-helper metadata --format json
+ecstatic metadata --format json
 ```
 
 **Output environment variables:**
@@ -67,10 +64,10 @@ Uses `execve(2)` to replace the process, making it ideal for container entrypoin
 
 ```sh
 # Run your application with ECS metadata in the environment
-ecs-task-helper exec /app/myservice
+ecstatic exec /app/myservice
 
 # Pass arguments to the command
-ecs-task-helper exec /app/myservice --port 8080
+ecstatic exec /app/myservice --port 8080
 ```
 
 If the ECS metadata endpoint is not available (e.g., running locally),
@@ -82,16 +79,16 @@ A lightweight HTTP client for health checks. Returns exit code 0 on success, 1 o
 
 ```sh
 # Basic health check (expects HTTP 200)
-ecs-task-helper check http://localhost:8080/health
+ecstatic check http://localhost:8080/health
 
 # Custom timeout
-ecs-task-helper check --timeout 5s http://localhost:8080/health
+ecstatic check --timeout 5s http://localhost:8080/health
 
 # Accept multiple status codes
-ecs-task-helper check --status 200,204 http://localhost:8080/health
+ecstatic check --status 200,204 http://localhost:8080/health
 
 # Quiet mode (suppress response body)
-ecs-task-helper check --quiet http://localhost:8080/health
+ecstatic check --quiet http://localhost:8080/health
 ```
 
 **Flags:**
@@ -111,7 +108,7 @@ ecs-task-helper check --quiet http://localhost:8080/health
 
 ## Example: ECS Task Definition
 
-Using `ecs-task-helper` as an entrypoint wrapper:
+Using `ecstatic` as an entrypoint wrapper:
 
 ```json
 {
@@ -119,10 +116,10 @@ Using `ecs-task-helper` as an entrypoint wrapper:
     {
       "name": "myapp",
       "image": "myapp:latest",
-      "entryPoint": ["/ecs-task-helper", "exec"],
+      "entryPoint": ["/ecstatic", "exec"],
       "command": ["/app/myservice"],
       "healthCheck": {
-        "command": ["CMD", "/ecs-task-helper", "check", "--quiet", "http://localhost:8080/health"],
+        "command": ["CMD", "/ecstatic", "check", "--quiet", "http://localhost:8080/health"],
         "interval": 30,
         "timeout": 5,
         "retries": 3
@@ -135,10 +132,10 @@ Using `ecs-task-helper` as an entrypoint wrapper:
 To include the binary in your image, use a multi-stage build:
 
 ```dockerfile
-FROM ghcr.io/ixti/ecs-task-helper:latest AS ecs-task-helper
+FROM ghcr.io/ixti/ecstatic:latest AS ecstatic
 
 FROM your-base-image
-COPY --from=ecs-task-helper /ecs-task-helper /ecs-task-helper
+COPY --from=ecstatic /ecstatic /ecstatic
 # ... rest of your Dockerfile
 ```
 
@@ -146,11 +143,11 @@ COPY --from=ecs-task-helper /ecs-task-helper /ecs-task-helper
 
 ```sh
 # Build binary
-go build -o ecs-task-helper .
+go build -o ecstatic .
 
 # Run tests
 go test ./...
 
 # Build Docker image
-docker build -t ecs-task-helper .
+docker build -t ecstatic .
 ```

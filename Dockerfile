@@ -13,12 +13,17 @@ ARG VERSION=dev
 RUN set -eux; \
   CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
     go build \
-      -ldflags="-s -w -X github.com/ixti/ecs-task-helper/cmd.version=${VERSION}" \
-      -o /ecs-task-helper \
+      -ldflags="-s -w -X github.com/ixti/ecstatic/cmd.version=${VERSION}" \
+      -o /ecstatic \
       .
 
 FROM scratch
-COPY --from=builder /ecs-task-helper /ecs-task-helper
+
+LABEL org.opencontainers.image.source=https://github.com/ixti/ecstatic
+LABEL org.opencontainers.image.description="Joyful ECS Task Utilities"
+LABEL org.opencontainers.image.licenses=MIT
+
+COPY --from=builder /ecstatic /bin/ecstatic
 
 ENTRYPOINT ["/ecs-task-helper"]
 CMD ["help"]

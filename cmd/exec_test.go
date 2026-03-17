@@ -24,7 +24,7 @@ func TestNewExecCommand(t *testing.T) {
 		deps := &execCmdDeps{
 			metadataCmdDeps: metadataCmdDeps{
 				FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-					return testMetadata(), nil
+					return testMetadataWithClusterName(), nil
 				},
 				Timeout: 5 * time.Second,
 			},
@@ -121,7 +121,7 @@ func TestNewExecCommand(t *testing.T) {
 		deps := &execCmdDeps{
 			metadataCmdDeps: metadataCmdDeps{
 				FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-					return testMetadata(), nil
+					return testMetadataWithClusterName(), nil
 				},
 				Timeout: 5 * time.Second,
 			},
@@ -147,7 +147,7 @@ func TestNewExecCommand(t *testing.T) {
 		deps := &execCmdDeps{
 			metadataCmdDeps: metadataCmdDeps{
 				FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-					return testMetadata(), nil
+					return testMetadataWithClusterName(), nil
 				},
 				Timeout: 5 * time.Second,
 			},
@@ -176,7 +176,7 @@ func TestNewExecCommand(t *testing.T) {
 		deps := &execCmdDeps{
 			metadataCmdDeps: metadataCmdDeps{
 				FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-					return testMetadata(), nil
+					return testMetadataWithClusterName(), nil
 				},
 				Timeout: 5 * time.Second,
 			},
@@ -205,7 +205,7 @@ func TestNewExecCommand(t *testing.T) {
 		deps := &execCmdDeps{
 			metadataCmdDeps: metadataCmdDeps{
 				FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-					return testMetadata(), nil
+					return testMetadataWithClusterName(), nil
 				},
 				Timeout: 5 * time.Second,
 			},

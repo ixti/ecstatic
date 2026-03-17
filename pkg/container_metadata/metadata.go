@@ -16,12 +16,27 @@ type Metadata struct {
 }
 
 // TaskID returns TaskID part of TaskARN.
+//
+// Handles both ARN formats:
+//   - arn:aws:ecs:region:account:task/cluster-name/task-id
+//   - arn:aws:ecs:region:account:task/task-id (legacy)
+//
+// And both ClusterName formats returned by the ECS metadata endpoint:
+//   - Short name: "default"
+//   - Full ARN:   "arn:aws:ecs:region:account:cluster/cluster-name"
 func (m *Metadata) TaskID() string {
 	if m.ClusterName == "" {
 		return ""
 	}
 
-	if _, id, ok := strings.Cut(m.TaskARN, ":task/"+m.ClusterName+"/"); ok {
+	clusterName := m.ClusterName
+
+	// Extract short cluster name from ARN if needed
+	if _, name, ok := strings.Cut(clusterName, ":cluster/"); ok {
+		clusterName = name
+	}
+
+	if _, id, ok := strings.Cut(m.TaskARN, ":task/"+clusterName+"/"); ok {
 		return id
 	}
 

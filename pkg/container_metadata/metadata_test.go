@@ -37,7 +37,7 @@ func expectedOverrides() []string {
 }
 
 func TestMetadata_TaskID(t *testing.T) {
-	t.Run("with valid TaskARN", func(t *testing.T) {
+	t.Run("with short cluster name", func(t *testing.T) {
 		metadata := &Metadata{
 			ClusterName: "default",
 			TaskARN:     "arn:aws:ecs:us-west-2:111122223333:task/default/8f03e41243824aea923aca126495f665",
@@ -46,9 +46,27 @@ func TestMetadata_TaskID(t *testing.T) {
 		assert.Equal(t, "8f03e41243824aea923aca126495f665", metadata.TaskID())
 	})
 
-	t.Run("with invalid TaskARN", func(t *testing.T) {
+	t.Run("with cluster ARN", func(t *testing.T) {
+		metadata := &Metadata{
+			ClusterName: "arn:aws:ecs:us-west-2:111122223333:cluster/default",
+			TaskARN:     "arn:aws:ecs:us-west-2:111122223333:task/default/8f03e41243824aea923aca126495f665",
+		}
+
+		assert.Equal(t, "8f03e41243824aea923aca126495f665", metadata.TaskID())
+	})
+
+	t.Run("with mismatched cluster name", func(t *testing.T) {
 		metadata := &Metadata{
 			ClusterName: "deadbeef",
+			TaskARN:     "arn:aws:ecs:us-west-2:111122223333:task/default/8f03e41243824aea923aca126495f665",
+		}
+
+		assert.Equal(t, "", metadata.TaskID())
+	})
+
+	t.Run("with mismatched cluster ARN", func(t *testing.T) {
+		metadata := &Metadata{
+			ClusterName: "arn:aws:ecs:us-west-2:111122223333:cluster/deadbeef",
 			TaskARN:     "arn:aws:ecs:us-west-2:111122223333:task/default/8f03e41243824aea923aca126495f665",
 		}
 

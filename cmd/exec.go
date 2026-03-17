@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/ixti/ecs-task-helper/pkg/container_metadata"
+	"github.com/ixti/ecstatic/pkg/container_metadata"
 	"github.com/spf13/cobra"
 	"golang.org/x/sys/unix"
 )

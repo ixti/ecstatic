@@ -48,7 +48,7 @@ func TestNewRootCommand(t *testing.T) {
 
 		cmd := NewRootCommand()
 
-		assert.Equal("ecs-task-helper", cmd.Use)
+		assert.Equal("ecstatic", cmd.Use)
 		assert.Equal("ECS task helper utilities", cmd.Short)
 	})
 
@@ -88,7 +88,7 @@ func TestNewRootCommand(t *testing.T) {
 		err := cmd.Execute()
 
 		require.NoError(err)
-		assert.Contains(out.String(), "ecs-task-helper")
+		assert.Contains(out.String(), "ecstatic")
 		assert.Contains(out.String(), "metadata")
 		assert.Contains(out.String(), "exec")
 	})

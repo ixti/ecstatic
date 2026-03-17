@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ixti/ecs-task-helper/pkg/container_metadata"
+	"github.com/ixti/ecstatic/pkg/container_metadata"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

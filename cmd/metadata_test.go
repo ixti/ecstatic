@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func testMetadata() *container_metadata.Metadata {
+func testMetadataWithClusterName() *container_metadata.Metadata {
 	return &container_metadata.Metadata{
 		ContainerARN:          "arn:aws:ecs:us-west-2:111122223333:container/0206b271-b33f-47ab-86c6-a0ba208a70a9",
 		ContainerName:         "curl",
@@ -27,6 +27,19 @@ func testMetadata() *container_metadata.Metadata {
 	}
 }
 
+func testMetadataWithClusterARN() *container_metadata.Metadata {
+	return &container_metadata.Metadata{
+		ContainerARN:          "arn:aws:ecs:us-west-2:111122223333:container/0206b271-b33f-47ab-86c6-a0ba208a70a9",
+		ContainerName:         "curl",
+		ContainerImage:        "111122223333.dkr.ecr.us-west-2.amazonaws.com/curltest:latest",
+		TaskARN:               "arn:aws:ecs:us-west-2:111122223333:task/default/8f03e41243824aea923aca126495f665",
+		TaskDefinitionFamily:  "curltest",
+		TaskDefinitionVersion: "24",
+		ClusterARN:            "arn:aws:ecs:us-west-2:111122223333:cluster/default",
+		ClusterName:           "default",
+	}
+}
+
 func TestNewMetadataCommand(t *testing.T) {
 	t.Run("with successful fetch outputs environ by default", func(t *testing.T) {
 		assert := assert.New(t)
@@ -34,7 +47,7 @@ func TestNewMetadataCommand(t *testing.T) {
 
 		deps := &metadataCmdDeps{
 			FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-				return testMetadata(), nil
+				return testMetadataWithClusterName(), nil
 			},
 			Timeout: 5 * time.Second,
 		}
@@ -60,7 +73,7 @@ func TestNewMetadataCommand(t *testing.T) {
 
 		deps := &metadataCmdDeps{
 			FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-				return testMetadata(), nil
+				return testMetadataWithClusterName(), nil
 			},
 			Timeout: 5 * time.Second,
 		}
@@ -77,13 +90,13 @@ func TestNewMetadataCommand(t *testing.T) {
 		assert.Contains(out.String(), "ECS_CONTAINER_NAME=curl\n")
 	})
 
-	t.Run("with --format=json outputs JSON", func(t *testing.T) {
+	t.Run("with --format=json outputs JSON without clusterARN", func(t *testing.T) {
 		assert := assert.New(t)
 		require := require.New(t)
 
 		deps := &metadataCmdDeps{
 			FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-				return testMetadata(), nil
+				return testMetadataWithClusterName(), nil
 			},
 			Timeout: 5 * time.Second,
 		}
@@ -99,6 +112,33 @@ func TestNewMetadataCommand(t *testing.T) {
 		assert.Contains(out.String(), `"containerARN":"arn:aws:ecs:us-west-2:111122223333:container/0206b271-b33f-47ab-86c6-a0ba208a70a9"`)
 		assert.Contains(out.String(), `"containerName":"curl"`)
 		assert.Contains(out.String(), `"taskARN":"arn:aws:ecs:us-west-2:111122223333:task/default/8f03e41243824aea923aca126495f665"`)
+		assert.Contains(out.String(), `"clusterName":"default"`)
+		assert.NotContains(out.String(), `"clusterARN"`)
+	})
+
+	t.Run("with --format=json outputs JSON with clusterARN", func(t *testing.T) {
+		assert := assert.New(t)
+		require := require.New(t)
+
+		deps := &metadataCmdDeps{
+			FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
+				return testMetadataWithClusterARN(), nil
+			},
+			Timeout: 5 * time.Second,
+		}
+
+		cmd := NewMetadataCommand(deps)
+		cmd.SetArgs([]string{"--format=json"})
+		out := &bytes.Buffer{}
+		cmd.SetOut(out)
+
+		err := cmd.Execute()
+
+		require.NoError(err)
+		assert.Contains(out.String(), `"containerARN":"arn:aws:ecs:us-west-2:111122223333:container/0206b271-b33f-47ab-86c6-a0ba208a70a9"`)
+		assert.Contains(out.String(), `"containerName":"curl"`)
+		assert.Contains(out.String(), `"taskARN":"arn:aws:ecs:us-west-2:111122223333:task/default/8f03e41243824aea923aca126495f665"`)
+		assert.Contains(out.String(), `"clusterARN":"arn:aws:ecs:us-west-2:111122223333:cluster/default"`)
 		assert.Contains(out.String(), `"clusterName":"default"`)
 	})
 
@@ -172,7 +212,7 @@ func TestNewMetadataCommand(t *testing.T) {
 		deps := &metadataCmdDeps{
 			FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
 				receivedTimeout = timeout
-				return testMetadata(), nil
+				return testMetadataWithClusterName(), nil
 			},
 			Timeout: expectedTimeout,
 		}
@@ -190,7 +230,7 @@ func TestNewMetadataCommand(t *testing.T) {
 
 		deps := &metadataCmdDeps{
 			FetchMetadata: func(ctx context.Context, timeout time.Duration) (*container_metadata.Metadata, error) {
-				return testMetadata(), nil
+				return testMetadataWithClusterName(), nil
 			},
 			Timeout: 5 * time.Second,
 		}

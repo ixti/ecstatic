@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -56,6 +57,21 @@ func Fetch(ctx context.Context, timeout time.Duration) (*Metadata, error) {
 		return nil, fmt.Errorf("failed to decode metadata response: %w", err)
 	}
 
+	var clusterARN, clusterName string
+
+	// According to documentation, `Cluster` in `/task` response will be
+	// either ARN or cluster name. JSON example of root endpoint shows that
+	// `labels.cluster` is cluster name, while we've seen ARNs instead.
+	// Thus, we're going to support both, so either both cluster ARN and Name
+	// will be populated, or Name only.
+	// ARN format: arn:aws:ecs:region:account:cluster/cluster-name
+	if prefix, name, ok := strings.Cut(metadata.Labels.Cluster, ":cluster/"); ok {
+		clusterARN = prefix + ":cluster/" + name
+		clusterName = name
+	} else {
+		clusterName = metadata.Labels.Cluster
+	}
+
 	return &Metadata{
 		ContainerARN:          metadata.ContainerARN,
 		ContainerName:         metadata.ContainerName,
@@ -63,6 +79,7 @@ func Fetch(ctx context.Context, timeout time.Duration) (*Metadata, error) {
 		TaskARN:               metadata.Labels.TaskARN,
 		TaskDefinitionFamily:  metadata.Labels.TaskDefinitionFamily,
 		TaskDefinitionVersion: metadata.Labels.TaskDefinitionVersion,
-		ClusterName:           metadata.Labels.Cluster,
+		ClusterARN:            clusterARN,
+		ClusterName:           clusterName,
 	}, nil
 }

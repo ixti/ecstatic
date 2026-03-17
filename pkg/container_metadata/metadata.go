@@ -12,6 +12,7 @@ type Metadata struct {
 	TaskARN               string `json:"taskARN"`
 	TaskDefinitionFamily  string `json:"taskDefinitionFamily"`
 	TaskDefinitionVersion string `json:"taskDefinitionVersion"`
+	ClusterARN            string `json:"clusterARN,omitempty"`
 	ClusterName           string `json:"clusterName"`
 }
 
@@ -20,24 +21,21 @@ type Metadata struct {
 // Handles both ARN formats:
 //   - arn:aws:ecs:region:account:task/cluster-name/task-id
 //   - arn:aws:ecs:region:account:task/task-id (legacy)
-//
-// And both ClusterName formats returned by the ECS metadata endpoint:
-//   - Short name: "default"
-//   - Full ARN:   "arn:aws:ecs:region:account:cluster/cluster-name"
 func (m *Metadata) TaskID() string {
-	if m.ClusterName == "" {
+	if m.TaskARN == "" {
 		return ""
 	}
 
-	clusterName := m.ClusterName
-
-	// Extract short cluster name from ARN if needed
-	if _, name, ok := strings.Cut(clusterName, ":cluster/"); ok {
-		clusterName = name
+	if m.ClusterName != "" {
+		if _, id, ok := strings.Cut(m.TaskARN, ":task/"+m.ClusterName+"/"); ok {
+			return id
+		}
 	}
 
-	if _, id, ok := strings.Cut(m.TaskARN, ":task/"+clusterName+"/"); ok {
-		return id
+	// Fallback for legacy format or empty ClusterName
+	lastIdx := strings.LastIndex(m.TaskARN, "/")
+	if lastIdx >= 0 {
+		return m.TaskARN[lastIdx+1:]
 	}
 
 	return ""
@@ -56,6 +54,7 @@ func (m *Metadata) EnvironWith(base []string) []string {
 		"ECS_TASK_ID=" + m.TaskID(),
 		"ECS_TASK_DEFINITION_FAMILY=" + m.TaskDefinitionFamily,
 		"ECS_TASK_DEFINITION_VERSION=" + m.TaskDefinitionVersion,
+		"ECS_CLUSTER_ARN=" + m.ClusterARN,
 		"ECS_CLUSTER_NAME=" + m.ClusterName,
 	}
 

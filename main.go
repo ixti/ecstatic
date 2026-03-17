@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/ixti/ecs-task-helper/cmd"
+	"github.com/ixti/ecstatic/cmd"
 )
 
 func main() {

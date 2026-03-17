@@ -33,7 +33,7 @@ func getFetchMetadataTimeout() time.Duration {
 
 func NewRootCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "ecs-task-helper",
+		Use:     "ecstatic",
 		Short:   "ECS task helper utilities",
 		Version: version,
 	}

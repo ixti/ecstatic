@@ -11,7 +11,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/ixti/ecs-task-helper/pkg/container_metadata"
+	"github.com/ixti/ecstatic/pkg/container_metadata"
 	"github.com/spf13/cobra"
 )
 
